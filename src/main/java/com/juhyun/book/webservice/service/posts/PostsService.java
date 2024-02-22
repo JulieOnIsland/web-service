@@ -2,12 +2,15 @@ package com.juhyun.book.webservice.service.posts;
 
 import com.juhyun.book.webservice.domain.posts.Posts;
 import com.juhyun.book.webservice.domain.posts.PostsRepository;
+import com.juhyun.book.webservice.dto.PostsListResponseDto;
 import com.juhyun.book.webservice.dto.PostsResponseDto;
 import com.juhyun.book.webservice.dto.PostsSaveRequestDto;
 import com.juhyun.book.webservice.dto.PostsUpdateRequestDto;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor // 생성자로 빈을 주입받는 방식
 @Service
@@ -39,6 +42,13 @@ public class PostsService {
                 .orElseThrow(() -> new IllegalArgumentException("해당 게시글이 없습니다. id=" + id));
 
         return new PostsResponseDto(entity);
+    }
+
+    @Transactional(readOnly = true) // readOnly = true : 트랜잭션 범위는 유지하되 조회 기능만 남겨두어 조회 속도 개선.
+    public List<PostsListResponseDto> findAllDesc() {
+        return postsRepository.findAllDesc().stream()
+                .map(PostsListResponseDto::new) // .map(Posts -> new PostsListResponseDto(posts)
+                .collect(Collectors.toList());
     }
 
 }
